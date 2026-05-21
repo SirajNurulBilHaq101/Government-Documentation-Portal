@@ -4,15 +4,24 @@
             <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Documents</h2>
             <p class="text-sm text-slate-500 mt-1">Manage portal documents and files</p>
         </div>
+        @if(auth()->user()->canManage())
         <a href="{{ route('documents.create') }}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none shadow-sm shadow-blue-600/20 px-5 rounded-lg font-medium">
             <i class="bi bi-cloud-upload mr-1"></i> Upload Document
         </a>
+        @endif
     </div>
 
     @if (session('success'))
         <div class="alert alert-success shadow-sm mb-6 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl">
             <i class="bi bi-check-circle-fill text-emerald-500"></i>
             <span class="font-medium text-sm">{{ session('success') }}</span>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-error shadow-sm mb-6 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl">
+            <i class="bi bi-exclamation-circle-fill text-rose-500"></i>
+            <span class="font-medium text-sm">{{ session('error') }}</span>
         </div>
     @endif
 
@@ -24,12 +33,10 @@
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title..." class="input input-sm h-10 input-bordered w-full pl-10 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all rounded-lg text-sm" />
                 </div>
                 <div class="flex gap-2">
-                    <select name="category_id" class="select select-sm h-10 select-bordered w-full md:w-44 bg-slate-50 border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all rounded-lg text-sm font-medium text-slate-600">
+                    <select name="category_id" class="select select-sm h-10 select-bordered w-full md:w-44 bg-slate-50 border-slate-200 focus:border-blue-500 transition-all rounded-lg text-sm font-medium text-slate-600">
                         <option value="">All Categories</option>
                         @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
+                            <option value="{{ $category->id }}" {{ request('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                         @endforeach
                     </select>
                     <button type="submit" class="btn btn-sm h-10 bg-slate-100 hover:bg-slate-200 text-slate-600 border-slate-200 rounded-lg px-4">
@@ -38,7 +45,7 @@
                 </div>
             </form>
         </div>
-        
+
         <div class="overflow-x-auto">
             <table class="table w-full text-sm">
                 <thead>
@@ -84,22 +91,38 @@
                             </td>
                             <td class="px-5 py-3.5 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
-                                    <a href="{{ route('documents.preview', $document->id) }}" target="_blank" class="btn btn-xs bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 rounded-md shadow-sm transition-colors" title="Preview">
+
+                                    {{-- Preview — semua role --}}
+                                    <a href="{{ route('documents.preview', $document->id) }}" target="_blank"
+                                        class="btn btn-xs bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200 rounded-md shadow-sm transition-colors" title="Preview">
                                         <i class="bi bi-eye"></i>
                                     </a>
-                                    <a href="{{ route('documents.download', $document->id) }}" class="btn btn-xs bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 rounded-md shadow-sm transition-colors" title="Download">
+
+                                    {{-- Download — semua role --}}
+                                    <a href="{{ route('documents.download', $document->id) }}"
+                                        class="btn btn-xs bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100 rounded-md shadow-sm transition-colors" title="Download">
                                         <i class="bi bi-download"></i>
                                     </a>
-                                    <a href="{{ route('documents.edit', $document->id) }}" class="btn btn-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 rounded-md shadow-sm transition-colors" title="Edit">
+
+                                    {{-- Edit — admin + staff (staff hanya dokumen miliknya) --}}
+                                    @if(auth()->user()->isAdmin() || (auth()->user()->isStaff() && $document->uploaded_by === auth()->id()))
+                                    <a href="{{ route('documents.edit', $document->id) }}"
+                                        class="btn btn-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 rounded-md shadow-sm transition-colors" title="Edit">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <form action="{{ route('documents.destroy', $document->id) }}" method="POST" onsubmit="return confirm('Delete this document?');" class="inline">
+                                    @endif
+
+                                    {{-- Delete — admin only --}}
+                                    @if(auth()->user()->isAdmin())
+                                    <form action="{{ route('documents.destroy', $document->id) }}" method="POST" onsubmit="return confirm('Delete this document permanently?');" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-xs bg-rose-50 text-rose-600 border-rose-200 hover:bg-rose-100 rounded-md shadow-sm transition-colors" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
+
                                 </div>
                             </td>
                         </tr>
@@ -112,9 +135,11 @@
                                     </div>
                                     <h3 class="text-base font-bold text-slate-700 mb-1">No Documents Found</h3>
                                     <p class="text-sm text-slate-500 mb-4">No documents match your search criteria.</p>
+                                    @if(auth()->user()->canManage())
                                     <a href="{{ route('documents.create') }}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none shadow-sm shadow-blue-600/20 rounded-lg px-5">
                                         Upload Document
                                     </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -122,7 +147,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         @if ($documents->hasPages())
             <div class="px-5 py-3 border-t border-slate-100 bg-slate-50/30">
                 {{ $documents->links() }}

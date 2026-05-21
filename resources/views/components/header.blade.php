@@ -20,13 +20,12 @@
                 </div>
                 <div class="text-left hidden sm:block">
                     <div class="font-bold text-sm text-slate-800 leading-none">{{ Auth::user()->name ?? 'Admin User' }}</div>
-                    <div class="text-[11px] text-slate-500 font-medium mt-1 leading-none">{{ Auth::user()->email ?? 'admin@gov.id' }}</div>
+                    <div class="text-[11px] text-slate-500 font-medium mt-1 leading-none">{{ Auth::user()->email ?? '' }}</div>
                 </div>
                 <i class="bi bi-chevron-down text-[10px] text-slate-400 ml-1"></i>
             </div>
 
-            <ul tabindex="0"
-                class="dropdown-content menu bg-white rounded-xl w-56 p-2 shadow-lg border border-slate-200 mt-4">
+            <ul tabindex="0" class="dropdown-content menu bg-white rounded-xl w-56 p-2 shadow-lg border border-slate-200 mt-4">
 
                 <li class="menu-title px-4 py-2 text-xs font-bold text-slate-400 uppercase tracking-wider">Account</li>
                 <li>
@@ -37,17 +36,23 @@
                 </li>
                 <li class="my-1 border-t border-slate-100"></li>
                 <li>
-                    <form action="{{ route('logout') }}" method="POST" class="p-0">
-                        @csrf
-                        <button class="w-full text-left text-red-600 hover:bg-red-50 rounded-lg py-2.5 px-4 font-medium transition-colors flex items-center">
-                            <i class="bi bi-box-arrow-right text-lg mr-3 opacity-80"></i>
-                            Sign Out
-                        </button>
-                    </form>
+                    {{-- Trigger form logout yang ada di luar dropdown --}}
+                    <button type="button"
+                        onclick="document.getElementById('logout-form').submit()"
+                        class="w-full text-left text-red-600 hover:bg-red-50 rounded-lg py-2.5 px-4 font-medium transition-colors flex items-center gap-2">
+                        <i class="bi bi-box-arrow-right text-lg opacity-80"></i>
+                        Sign Out
+                    </button>
                 </li>
+
             </ul>
 
         </div>
     </div>
 
 </header>
+
+{{-- Logout form di luar dropdown agar CSRF token selalu terbaca --}}
+<form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+    @csrf
+</form>

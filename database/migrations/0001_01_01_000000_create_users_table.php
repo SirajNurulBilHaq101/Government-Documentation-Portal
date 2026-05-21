@@ -29,7 +29,8 @@ return new class extends Migration
             // Role
             $table->enum('role', [
                 'admin',
-                'staff'
+                'staff',
+                'viewer'
             ])->default('staff');
 
             // Profile

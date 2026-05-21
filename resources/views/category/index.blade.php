@@ -4,9 +4,11 @@
             <h2 class="text-2xl font-extrabold text-slate-800 tracking-tight">Categories</h2>
             <p class="text-sm text-slate-500 mt-1">Manage all document classifications</p>
         </div>
+        @if(auth()->user()->isAdmin())
         <a href="{{ route('categories.create') }}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none shadow-sm shadow-blue-600/20 px-5 rounded-lg font-medium">
             <i class="bi bi-plus-lg mr-1"></i> New Category
         </a>
+        @endif
     </div>
 
     @if (session('success'))
@@ -34,7 +36,9 @@
                         <th class="font-semibold px-5 py-3.5 rounded-none w-16 text-center">ID</th>
                         <th class="font-semibold px-5 py-3.5 rounded-none">Category Name</th>
                         <th class="font-semibold px-5 py-3.5 rounded-none">Description</th>
+                        @if(auth()->user()->isAdmin())
                         <th class="font-semibold px-5 py-3.5 rounded-none text-right">Actions</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody class="text-slate-600">
@@ -45,6 +49,7 @@
                                 <div class="font-semibold text-slate-800">{{ $category->name }}</div>
                             </td>
                             <td class="px-5 py-3.5 text-slate-500">{{ Str::limit($category->description, 60) ?: '-' }}</td>
+                            @if(auth()->user()->isAdmin())
                             <td class="px-5 py-3.5 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <a href="{{ route('categories.edit', $category->id) }}" class="btn btn-xs bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100 rounded-md shadow-sm transition-colors" title="Edit">
@@ -59,19 +64,22 @@
                                     </form>
                                 </div>
                             </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="text-center py-14">
+                            <td colspan="{{ auth()->user()->isAdmin() ? 4 : 3 }}" class="text-center py-14">
                                 <div class="flex flex-col items-center justify-center text-slate-400">
                                     <div class="p-4 bg-slate-50 rounded-full mb-3">
                                         <i class="bi bi-tags text-3xl text-slate-300"></i>
                                     </div>
                                     <h3 class="text-base font-bold text-slate-700 mb-1">No Categories Found</h3>
-                                    <p class="text-sm text-slate-500 mb-4">You haven't created any document categories yet.</p>
+                                    <p class="text-sm text-slate-500 mb-4">No categories have been created yet.</p>
+                                    @if(auth()->user()->isAdmin())
                                     <a href="{{ route('categories.create') }}" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none shadow-sm shadow-blue-600/20 rounded-lg px-5">
                                         Create First Category
                                     </a>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -79,7 +87,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         @if ($categories->hasPages())
             <div class="px-5 py-3 border-t border-slate-100 bg-slate-50/30">
                 {{ $categories->links() }}
