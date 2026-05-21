@@ -13,11 +13,34 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+
+            // Basic Information
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // Government Portal Fields
+            $table->string('username')->unique();
+            $table->string('nip')->nullable()->unique(); // Nomor Induk Pegawai
+            $table->string('position')->nullable(); // Jabatan
+            $table->string('department')->nullable(); // Bidang / Divisi
+
+            // Role
+            $table->enum('role', [
+                'admin',
+                'staff'
+            ])->default('staff');
+
+            // Profile
+            $table->string('photo')->nullable();
+
+            // Status
+            $table->boolean('is_active')->default(true);
+
+            // Remember Login
             $table->rememberToken();
+
             $table->timestamps();
         });
 
@@ -29,10 +52,16 @@ return new class extends Migration
 
         Schema::create('sessions', function (Blueprint $table) {
             $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->index();
+
+            $table->foreignId('user_id')
+                ->nullable()
+                ->index();
+
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
+
             $table->longText('payload');
+
             $table->integer('last_activity')->index();
         });
     }
