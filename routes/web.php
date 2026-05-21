@@ -15,7 +15,21 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
 
     Route::get('/', function () {
-        return view('dashboard');
+        $totalDocuments = \App\Models\Document::count();
+        $totalCategories = \App\Models\Category::count();
+        $activeUsers = \App\Models\User::where('is_active', true)->count();
+        $totalActivities = \App\Models\ActivityLog::count();
+        $recentDocuments = \App\Models\Document::with('category')->latest()->take(2)->get();
+        $recentActivities = \App\Models\ActivityLog::with('user', 'document')->latest()->take(2)->get();
+
+        return view('dashboard', compact(
+            'totalDocuments', 
+            'totalCategories', 
+            'activeUsers', 
+            'totalActivities',
+            'recentDocuments',
+            'recentActivities'
+        ));
     });
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');

@@ -16,9 +16,17 @@
 
     {{-- Icons --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    
+    <style>
+        /* Small refinement for text rendering */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+    </style>
 </head>
 
-<body class="bg-base-200">
+<body class="bg-slate-50 text-slate-800">
 
     <div class="drawer lg:drawer-open">
 
@@ -30,21 +38,17 @@
             <x-header />
 
             {{-- Page Content --}}
-            <main class="flex-1 p-6">
+            <main class="flex-1 p-4 md:p-6 lg:p-8">
 
                 {{ $slot }}
 
             </main>
 
             {{-- Footer --}}
-            <footer class="footer footer-center bg-base-100 border-t border-base-300 p-4">
-
+            <footer class="footer footer-center bg-white border-t border-slate-200 p-6 text-slate-500">
                 <aside>
-                    <p>
-                        © {{ date('Y') }} Government Documentation Portal
-                    </p>
+                    <p class="font-medium">© {{ date('Y') }} Government Documentation Portal. All rights reserved.</p>
                 </aside>
-
             </footer>
 
         </div>

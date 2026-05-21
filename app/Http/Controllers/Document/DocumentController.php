@@ -24,7 +24,7 @@ class DocumentController extends Controller
             $query->where('category_id', $request->category_id);
         }
 
-        $documents = $query->latest()->paginate(10)->withQueryString();
+        $documents = $query->latest()->paginate(5)->withQueryString();
         $categories = Category::all();
 
         return view('document.index', compact('documents', 'categories'));
