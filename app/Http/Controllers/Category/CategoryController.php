@@ -46,6 +46,14 @@ class CategoryController extends Controller
             ->with('success', 'Category created successfully.');
     }
 
+    /**
+     * Show is not used publicly — redirect to index.
+     */
+    public function show(Category $category)
+    {
+        return redirect()->route('categories.index');
+    }
+
     public function edit(Category $category)
     {
         if (!Auth::user()->isAdmin()) {

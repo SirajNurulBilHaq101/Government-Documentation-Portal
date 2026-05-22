@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
         User::create([
             'name'       => 'Administrator',
             'username'   => 'admin',
-            'email'      => 'admin@govdocs.test',
+            'email'      => 'admin@admin.com',
             'password'   => Hash::make('password'),
             'nip'        => '199001010001',
             'position'   => 'System Administrator',

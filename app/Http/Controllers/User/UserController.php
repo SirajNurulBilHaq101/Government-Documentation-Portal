@@ -67,6 +67,14 @@ class UserController extends Controller
             ->with('success', 'User created successfully.');
     }
 
+    /**
+     * Show is not used — redirect to index.
+     */
+    public function show(User $user)
+    {
+        return redirect()->route('users.index');
+    }
+
     public function edit(User $user)
     {
         return view('user.edit', compact('user'));
@@ -109,13 +117,11 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        // Prevent admin from deleting themselves
         if ($user->id === auth()->id()) {
             return redirect()->route('users.index')
-                ->with('error', 'You cannot delete your own account.');
+                ->with('error', 'You cannot deactivate your own account.');
         }
 
-        // Soft deactivate instead of hard delete
         $user->update(['is_active' => false]);
 
         return redirect()->route('users.index')

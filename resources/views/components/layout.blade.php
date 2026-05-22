@@ -17,13 +17,7 @@
     {{-- Icons --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     
-    <style>
-        /* Small refinement for text rendering */
-        body {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-    </style>
+
 </head>
 
 <body class="bg-slate-50 text-slate-800">

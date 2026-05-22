@@ -22,8 +22,12 @@ class ActivityController extends Controller
             $query->where('user_id', $request->user_id);
         }
 
+        if ($request->filled('action')) {
+            $query->where('action', 'like', $request->action . '%');
+        }
+
         $activities = $query->latest()->paginate(15)->withQueryString();
-        $users      = User::where('is_active', true)->orderBy('name')->get();
+        $users      = User::orderBy('name')->get();
 
         return view('activity.index', compact('activities', 'users'));
     }

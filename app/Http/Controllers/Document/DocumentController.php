@@ -32,7 +32,6 @@ class DocumentController extends Controller
 
     public function create()
     {
-        // Only admin and staff can upload
         if (Auth::user()->isViewer()) {
             abort(403, 'You do not have permission to upload documents.');
         }
@@ -74,14 +73,29 @@ class DocumentController extends Controller
             ->with('success', 'Document uploaded successfully.');
     }
 
+    public function show(Document $document)
+    {
+        $document->load(['category', 'uploader']);
+
+        $fileExists = Storage::disk('public')->exists($document->file_path);
+        $fileSize   = $fileExists ? Storage::disk('public')->size($document->file_path) : null;
+        $fileName   = $fileExists ? basename($document->file_path) : null;
+
+        $activities = ActivityLog::with('user')
+            ->where('document_id', $document->id)
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('document.show', compact('document', 'fileExists', 'fileSize', 'fileName', 'activities'));
+    }
+
     public function edit(Document $document)
     {
-        // Viewer cannot edit
         if (Auth::user()->isViewer()) {
             abort(403, 'You do not have permission to edit documents.');
         }
 
-        // Staff can only edit their own documents
         if (Auth::user()->isStaff() && $document->uploaded_by !== Auth::id()) {
             abort(403, 'You can only edit documents that you uploaded.');
         }
@@ -128,13 +142,12 @@ class DocumentController extends Controller
             'action'      => 'edit',
         ]);
 
-        return redirect()->route('documents.index')
+        return redirect()->route('documents.show', $document->id)
             ->with('success', 'Document updated successfully.');
     }
 
     public function destroy(Document $document)
     {
-        // Only admin can delete
         if (!Auth::user()->isAdmin()) {
             abort(403, 'Only administrators can delete documents.');
         }
@@ -160,7 +173,7 @@ class DocumentController extends Controller
     public function preview(Document $document)
     {
         if (!Storage::disk('public')->exists($document->file_path)) {
-            abort(404);
+            abort(404, 'File not found.');
         }
 
         return response()->file(storage_path('app/public/' . $document->file_path));
@@ -169,7 +182,7 @@ class DocumentController extends Controller
     public function download(Document $document)
     {
         if (!Storage::disk('public')->exists($document->file_path)) {
-            abort(404);
+            abort(404, 'File not found.');
         }
 
         ActivityLog::create([
